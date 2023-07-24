@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 
-contract DERToken is ERC20, Ownable, Pausable  {
+contract AUDCT is ERC20, Ownable, Pausable  {
  
     using SafeMath for uint256;
 
@@ -27,7 +27,7 @@ contract DERToken is ERC20, Ownable, Pausable  {
     address public immutable uniswapV2Pair;
     
 
-    constructor(address _router, address _vault) ERC20("Dean Real Estate", "DER") {
+    constructor(address _router, address _vault) ERC20("Dean Real Estate Security Token", "AUDCT") {
  
         _mint(msg.sender, 100000000 * 10 ** _decimals);
         // IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D); /* mainnet */
