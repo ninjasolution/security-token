@@ -15,9 +15,11 @@ contract AUDCT is ERC20, Ownable, Pausable  {
     using SafeMath for uint256;
 
     uint8 private _decimals = 2;
-    uint256 public divisor = 10000;
-    uint256 public buyFee = 150;
-    uint256 public sellFee = 500;
+    uint8 public divisor = 10000;
+    uint8 public buyFee = 150;
+    uint8 public sellFee = 500;
+    uint8 public maxSellFee = 1000;
+    uint8 public maxBuyFee = 200;
 
     address public vault;
 
@@ -45,6 +47,16 @@ contract AUDCT is ERC20, Ownable, Pausable  {
 
         super._transfer(from, vault, feeAmount);
         super._transfer(from, to, amount.sub(feeAmount));
+    }
+
+    function setSellFee(uint8 fee) external {
+        require(fee <= maxSellFee, "AUDCT: Exceeded max sell fee");
+        sellFee = fee;
+    }
+
+    function setBuyFee(uint8 fee) external {
+        require(fee <= maxBuyFee, "AUDCT: Exceeded max buy fee");
+        maxBuyFee = fee;
     }
 
     receive() external payable {    }

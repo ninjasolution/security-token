@@ -71,16 +71,13 @@ describe("DREToken", function () {
 
     it("shouldn't tax on transfer", async function () {
       const { token, deployer, fund, target } = await loadFixture(deploy)
-      await token.approve(target.address, eth(200))
-      await token.transfer(target.address, eth(10))
 
-      // await expect(token.transfer(target.address, eth(100))).to.changeTokenBalances(
-      //   token,
-      //   [deployer, fund, target],
-      //   [eth(100).mul(-1), 0, eth(100)]
-      // )
+      await expect(token.transfer(target.address, eth(100))).to.changeTokenBalances(
+        token,
+        [deployer, fund, target],
+        [eth(100).mul(-1), 0, eth(100)]
+      )
 
-      expect(1).to.equal(1)
     })
 
   })
