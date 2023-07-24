@@ -7,6 +7,10 @@ function eth(amount) {
   return ethers.utils.parseEther(amount.toString())
 }
 
+function _token(amount) {
+  return (amount * 100).toString()
+}
+
 describe("DREToken", function () {
 
   // We define a fixture to reuse the same setup in every test.
@@ -28,13 +32,13 @@ describe("DREToken", function () {
 
     // approve the spending
     await weth9.approve(router.address, eth(1000))
-    await token.approve(router.address, eth(1000))
+    await token.approve(router.address, _token(1000))
 
     // add liquidity
     await router.addLiquidityETH(
       token.address,
-      eth(500),
-      eth(500),
+      _token(500),
+      _token(500),
       eth(10),
       deployer.address,
       constants.MaxUint256,
@@ -48,34 +52,35 @@ describe("DREToken", function () {
 
     it("should tax on buy", async function () {
       const { router, weth9, token, deployer, fund, pair } = await loadFixture(deploy)
+      
       await expect(router.swapETHForExactTokens(
-        eth(100),
+        _token(100),
         [weth9.address, token.address],
         deployer.address,
         constants.MaxUint256,
-        { value: eth(1000) }
-      )).to.changeTokenBalances(token, [deployer, fund, pair], [eth(98.5), eth(1.5), eth(100).mul(-1)])
+        { value: eth(100) }
+      )).to.changeTokenBalances(token, [deployer, fund, pair], [_token(98.5), _token(1.5), _token(100) * -1])
     })
 
     it("should tax on sell", async function () {
       const { router, weth9, token, deployer, fund, pair } = await loadFixture(deploy)
       // since we have a fee, we must call SupportingFeeOnTransferTokens
       await expect(router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-        eth(100),
+        _token(100),
         1,
         [token.address, weth9.address],
         deployer.address,
         constants.MaxUint256,
-      )).to.changeTokenBalances(token, [deployer, fund, pair], [eth(100).mul(-1), eth(5), eth(95)])
+      )).to.changeTokenBalances(token, [deployer, fund, pair], [_token(100) * -1, _token(5), _token(95)])
     })
 
     it("shouldn't tax on transfer", async function () {
       const { token, deployer, fund, target } = await loadFixture(deploy)
 
-      await expect(token.transfer(target.address, eth(100))).to.changeTokenBalances(
+      await expect(token.transfer(target.address, _token(100))).to.changeTokenBalances(
         token,
         [deployer, fund, target],
-        [eth(100).mul(-1), 0, eth(100)]
+        [_token(100) * -1, 0, _token(100)]
       )
 
     })

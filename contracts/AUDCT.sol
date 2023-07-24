@@ -15,17 +15,17 @@ contract AUDCT is ERC20, Ownable, Pausable  {
     using SafeMath for uint256;
 
     uint8 private _decimals = 2;
-    uint8 public divisor = 10000;
-    uint8 public buyFee = 150;
-    uint8 public sellFee = 500;
-    uint8 public maxSellFee = 1000;
-    uint8 public maxBuyFee = 200;
+    uint32 public divisor = 10000;
+    uint32 public buyFee = 150;
+    uint32 public sellFee = 500;
+    uint32 public maxSellFee = 1000;
+    uint32 public maxBuyFee = 200;
 
     address public vault;
 
     address public immutable uniswapV2Pair;
 
-    constructor(address _router, address _vault) ERC20("Dean Real Estate Security Token", "AUDCT") {
+    constructor(address _router, address _vault) ERC20("Australian Decentralised Capital Token", "AUDCT") {
  
         _mint(msg.sender, 100000000 * 10 ** _decimals);
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(_router);
@@ -49,12 +49,12 @@ contract AUDCT is ERC20, Ownable, Pausable  {
         super._transfer(from, to, amount.sub(feeAmount));
     }
 
-    function setSellFee(uint8 fee) external {
+    function setSellFee(uint32 fee) external onlyOwner() {
         require(fee <= maxSellFee, "AUDCT: Exceeded max sell fee");
         sellFee = fee;
     }
 
-    function setBuyFee(uint8 fee) external {
+    function setBuyFee(uint32 fee) external onlyOwner() {
         require(fee <= maxBuyFee, "AUDCT: Exceeded max buy fee");
         maxBuyFee = fee;
     }
