@@ -1,9 +1,9 @@
 {
-  "name": "smart-contracts",
+  "name": "security-token-smart-contract",
   "version": "0.0.1",
-  "description": "library of smart contracts",
+  "description": "Staking Token",
   "main": "hardhat.config.js",
-  "repository": "https://github.com/onmychain/smart-contracts.git",
+  "repository": "https://github.com/ninjasolution/security-token.git",
   "author": "Cyrille ",
   "license": "MIT",
   "devDependencies": {
