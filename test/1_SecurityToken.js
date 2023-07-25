@@ -48,11 +48,26 @@ describe("DREToken", function () {
     return { token, deployer, fund, target, factory, router, weth9, pair }
   }
 
-  describe("transfer", function () {
+  describe("Transfer", function () {
+
+    it("shouldn't tax on transfer", async function () {
+      const { token, deployer, fund, target } = await loadFixture(deploy)
+
+      await expect(token.transfer(target.address, _token(100))).to.changeTokenBalances(
+        token,
+        [deployer, fund, target],
+        [_token(100) * -1, 0, _token(100)]
+      )
+
+    })
+
+  })
+
+  describe("Swap", function () {
 
     it("should tax on buy", async function () {
       const { router, weth9, token, deployer, fund, pair } = await loadFixture(deploy)
-      
+
       await expect(router.swapETHForExactTokens(
         _token(100),
         [weth9.address, token.address],
@@ -72,17 +87,6 @@ describe("DREToken", function () {
         deployer.address,
         constants.MaxUint256,
       )).to.changeTokenBalances(token, [deployer, fund, pair], [_token(100) * -1, _token(5), _token(95)])
-    })
-
-    it("shouldn't tax on transfer", async function () {
-      const { token, deployer, fund, target } = await loadFixture(deploy)
-
-      await expect(token.transfer(target.address, _token(100))).to.changeTokenBalances(
-        token,
-        [deployer, fund, target],
-        [_token(100) * -1, 0, _token(100)]
-      )
-
     })
 
   })
