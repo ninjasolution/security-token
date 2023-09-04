@@ -214,7 +214,7 @@ contract AUDCT is ERC20, Ownable, Pausable  {
  
     using SafeMath for uint256;
 
-    uint8 private _decimals = 2;
+    uint8 private _decimals = 4;
     uint32 public divisor = 10000;
     uint32 public buyFee = 150;
     uint32 public sellFee = 500;
@@ -257,6 +257,10 @@ contract AUDCT is ERC20, Ownable, Pausable  {
     function setBuyFee(uint32 fee) external onlyOwner() {
         require(fee <= maxBuyFee, "AUDCT: Exceeded max buy fee");
         maxBuyFee = fee;
+    }
+
+    function decimals() public view override returns (uint8) {
+        return _decimals;
     }
 
     receive() external payable {    }

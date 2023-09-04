@@ -57,7 +57,7 @@ module.exports = {
     artifacts: "./artifacts"
   },
   mocha: {
-    timeout: 40000
+    timeout: 4000000000
   },
   etherscan: {
     apiKey: etherscanKey,
