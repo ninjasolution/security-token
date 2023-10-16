@@ -14,22 +14,25 @@ function _token(amount) {
 describe("DREToken", function () {
 
 
+  let token, pair;
+  let deployer, target, fund;
+  let _weth9;
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deploy() {
-    const [deployer, fund, target] = await ethers.getSigners();
+    const [ _deployer, _fund, _target] = await ethers.getSigners();
 
     // deploy the uniswap v2 protocol
     const { factory, router, weth9 } = await UniswapV2Deployer.deploy(deployer);
 
     // deploy our token
     const Token = await ethers.getContractFactory("AUDCT")
-    const token = await Token.deploy(router.address, fund.address)
+    token = await Token.deploy(router.address, _fund.address)
     await token.deployed()
 
     // get our pair
-    const pair = new ethers.Contract(await token.uniswapV2Pair(), UniswapV2Deployer.Interface.IUniswapV2Pair.abi)
+    pair = new ethers.Contract(await token.uniswapV2Pair(), UniswapV2Deployer.Interface.IUniswapV2Pair.abi)
 
     // approve the spending
     await weth9.approve(router.address, eth(1000))
@@ -46,14 +49,20 @@ describe("DREToken", function () {
       { value: eth(10) }
     )
 
-    return { token, deployer, fund, target, factory, router, weth9, pair }
+    deployer = _deployer;
+    fund = _fund;
+    target = _target;
+    _weth9 = weth9;
   }
+
+  before(async () => {
+    await deploy();
+  })
 
  
   describe("Transfer", function () {
 
     it("shouldn't tax on transfer", async function () {
-      const { token, deployer, fund, target } = await loadFixture(deploy)
 
       await expect(token.transfer(target.address, _token(100))).to.changeTokenBalances(
         token,
@@ -68,11 +77,10 @@ describe("DREToken", function () {
   describe("Swap", function () {
 
     it("should tax on buy", async function () {
-      const { router, weth9, token, deployer, fund, pair } = await loadFixture(deploy)
 
       await expect(router.swapETHForExactTokens(
         _token(100),
-        [weth9.address, token.address],
+        [_weth9.address, token.address],
         deployer.address,
         constants.MaxUint256,
         { value: eth(100) }
