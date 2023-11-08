@@ -16,7 +16,7 @@ describe("DREToken", function () {
 
   let token, pair;
   let deployer, target, fund;
-  let _weth9;
+  let _weth9, _router;
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -24,7 +24,7 @@ describe("DREToken", function () {
     const [ _deployer, _fund, _target] = await ethers.getSigners();
 
     // deploy the uniswap v2 protocol
-    const { factory, router, weth9 } = await UniswapV2Deployer.deploy(deployer);
+    const { factory, router, weth9 } = await UniswapV2Deployer.deploy(_deployer);
 
     // deploy our token
     const Token = await ethers.getContractFactory("AUDCT")
@@ -44,7 +44,7 @@ describe("DREToken", function () {
       _token(500),
       _token(500),
       eth(10),
-      deployer.address,
+      _deployer.address,
       constants.MaxUint256,
       { value: eth(10) }
     )
@@ -53,6 +53,7 @@ describe("DREToken", function () {
     fund = _fund;
     target = _target;
     _weth9 = weth9;
+    _router = router;
   }
 
   before(async () => {
@@ -78,7 +79,7 @@ describe("DREToken", function () {
 
     it("should tax on buy", async function () {
 
-      await expect(router.swapETHForExactTokens(
+      await expect(_router.swapETHForExactTokens(
         _token(100),
         [_weth9.address, token.address],
         deployer.address,
@@ -88,12 +89,11 @@ describe("DREToken", function () {
     })
 
     it("should tax on sell", async function () {
-      const { router, weth9, token, deployer, fund, pair } = await loadFixture(deploy)
       // since we have a fee, we must call SupportingFeeOnTransferTokens
-      await expect(router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+      await expect(_router.swapExactTokensForETHSupportingFeeOnTransferTokens(
         _token(100),
         1,
-        [token.address, weth9.address],
+        [token.address, _weth9.address],
         deployer.address,
         constants.MaxUint256,
       )).to.changeTokenBalances(token, [deployer, fund, pair], [_token(100) * -1, _token(5), _token(95)])
